@@ -20,19 +20,14 @@ type Article struct {
 var articles []Article
 
 func main() {
-	// Initialize the Colly collector
 	c := colly.NewCollector(
 		colly.AllowedDomains("www.wired.com", "wired.com"),
 	)
 
-	// Find and scrape headlines and links
 	c.OnHTML("a[href] h2", func(e *colly.HTMLElement) {
-		// Extract the parent <a> tag
 		parentA := e.DOM.Parent()
 
-		// Check if the parent is an <a> tag
 		if parentA.Is("a") {
-			// Extract the href attribute from the parent <a> tag
 			article := Article{Title: e.Text, Link: ""}
 			href, exists := parentA.Attr("href")
 			var sb strings.Builder
@@ -44,7 +39,6 @@ func main() {
 					sb.WriteString("https://www.wired.com")
 				}
 			} else {
-				// Print the text of the <h2> tag and the href
 				article.Title = ""
 				log.Printf("Warning: Article with title %s does not have a link.", article.Title)
 			}
@@ -55,23 +49,18 @@ func main() {
 		}
 
 	})
-	// Handle request errors
 	c.OnError(func(r *colly.Response, err error) {
 		log.Println("Request URL:", r.Request.URL, "failed with error:", err)
 	})
 
-	// Start scraping
 	log.Println("Scraping headlines...")
 	c.Visit("https://www.wired.com")
 
-	// Sort articles in reverse chronological order (newest first)
-	log.Println("Here are the articles:")
-	log.Println(articles)
+	// Sort in reverse chronological order.
 	sort.Slice(articles, func(i, j int) bool {
-		return i > j // Reverse order
+		return i > j
 	})
 
-	// Serve the scraped data on a web page
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		tmpl := `
 		<!DOCTYPE html>
