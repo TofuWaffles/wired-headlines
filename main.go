@@ -96,6 +96,6 @@ func main() {
 		}
 	})
 
-	log.Println("Serving at http://localhost:8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Println("Serving at http://localhost:80")
+	log.Fatal(http.ListenAndServe(":80", nil))
 }
