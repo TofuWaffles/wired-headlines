@@ -20,6 +20,15 @@ type Article struct {
 var articles []Article
 
 func main() {
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", Index)
+
+	log.Println("Serving at http://localhost:80")
+	err := http.ListenAndServe(":80", mux)
+	log.Fatal(err)
+}
+
+func Index(w http.ResponseWriter, r *http.Request) {
 	c := colly.NewCollector(
 		colly.AllowedDomains("www.wired.com", "wired.com"),
 	)
@@ -53,16 +62,13 @@ func main() {
 		log.Println("Request URL:", r.Request.URL, "failed with error:", err)
 	})
 
-	log.Println("Scraping headlines...")
 	c.Visit("https://www.wired.com")
 
 	// Sort in reverse chronological order.
 	sort.Slice(articles, func(i, j int) bool {
 		return i > j
 	})
-
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		tmpl := `
+	tmpl := `
 		<!DOCTYPE html>
 		<html lang="en">
 		<head>
@@ -90,12 +96,8 @@ func main() {
 		</html>
 		`
 
-		t := template.Must(template.New("webpage").Parse(tmpl))
-		if err := t.Execute(w, articles); err != nil {
-			log.Println("Template execution error:", err)
-		}
-	})
-
-	log.Println("Serving at http://localhost:80")
-	log.Fatal(http.ListenAndServe(":80", nil))
+	t := template.Must(template.New("webpage").Parse(tmpl))
+	if err := t.Execute(w, articles); err != nil {
+		log.Println("Template execution error:", err)
+	}
 }
