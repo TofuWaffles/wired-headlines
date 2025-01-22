@@ -41,10 +41,8 @@ func Index(w http.ResponseWriter, r *http.Request) {
 			href, exists := parentA.Attr("href")
 			var sb strings.Builder
 			if exists {
-				log.Printf("Link exists for article: %s", e.Text)
 				// Ensure the link is absolute
 				if len(href) > 0 && href[0] == '/' {
-					log.Printf("Appending to link for %s", e.Text)
 					sb.WriteString("https://www.wired.com")
 				}
 			} else {
