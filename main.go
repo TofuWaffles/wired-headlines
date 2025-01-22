@@ -10,15 +10,6 @@ import (
 	"github.com/gocolly/colly/v2"
 )
 
-// Article represents a news headline with its link
-type Article struct {
-	Title string
-	Link  string
-}
-
-// Slice to store the scraped articles
-var articles []Article
-
 func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", Index)
@@ -29,6 +20,14 @@ func main() {
 }
 
 func Index(w http.ResponseWriter, r *http.Request) {
+	// Article represents a news headline with its link
+	type Article struct {
+		Title string
+		Link  string
+	}
+
+	var articles []Article
+
 	c := colly.NewCollector(
 		colly.AllowedDomains("www.wired.com", "wired.com"),
 	)
